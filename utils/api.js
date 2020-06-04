@@ -82,5 +82,5 @@ export async function addCardToDeck(key, card){
 export function getData(results){
     return results === null
         ? getDecks()
-        : console.warn('Existing data')
+        : results
 }
