@@ -1,57 +1,67 @@
 import { AsyncStorage } from "react-native"
-import STORAGE_KEY from './_Data'
 import data from './_Data';
 
-function saveDummyData(data){
-    AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(data))
-
-    return data
-}
-
+const STORAGE_KEY = 'FLASH_CARDS_DATA'
 //getDecks
 export async function  getDecks(){
     try {
-        const decks = await AsyncStorage.getItem(STORAGE_KEY)
+        const decks = JSON.parse(await AsyncStorage.getItem(STORAGE_KEY))
 
-        if(decks !== null){
-            return JSON.parse(decks)
-        }
+        return decks
     }
     catch (err){
         console.warn('getDecks failed', err)
     }
 }
+//deleteDeck(id)
+export async function deleteDeck(id){
+    try{
+        const decks = JSON.parse(await AsyncStorage.getItem(STORAGE_KEY))
+        delete decks[id]
+        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(results))
+    }
+    catch(err){
+        console.warn('problem deleting deck', err)
+    }
+}
 //getDeck(id)
 export async function getDeck(id){
     try{
-        const deck = await AsyncStorage.getItem(STORAGE_KEY)
-
-        if (deck !== null){
-            return deck[id]
-        }
+        getDecks()
+            .then(decks=>{
+                return decks[id]
+            })
     }
     catch (err){
         console.warn('getDeck failed', err)
     }
 }
 //saveDeckTitle(title)
-export async function saveDeckTitle(key, title){
+export async function saveDeckTitle(title){
     try {
-        await AsyncStorage.mergeItem(
-            STORAGE_KEY,
-            JSON.stringify({
-                [key] : {
-                    title: title,
-                    questions: [],
-                }
-            })
-        )
-    }
-    catch(err){
-        console.warn('failed to save deck title', err)
+        await AsyncStorage.mergeItem(STORAGE_KEY, JSON.stringify ({
+            [title]:{
+                title,
+                questions:[]
+            }
+        }))
+
+        return { [title]:{
+            title,
+            questions:[]
+        }}
+    }catch(err){
+        console.warn('failed to save deck titile', err)
     }
 }
 
+export async function clearDatabase(){
+    try{
+        await AsyncStorage.clear()
+    }catch(err){
+        console.log('error while deleting database', err)
+    }
+}
 
 //addcardToDeck(title, card)
 export async function addCardToDeck(key, card){
@@ -77,10 +87,4 @@ export async function addCardToDeck(key, card){
     }catch(err){
         console.warn('failed to addcard to deck', err)
     }
-}
-
-export function getData(results){
-    return results === null
-        ? getDecks()
-        : results
 }

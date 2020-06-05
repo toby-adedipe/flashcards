@@ -1,30 +1,75 @@
 import React, { Component} from 'react'
-import { View, Text, Button} from 'react-native';
-import { getDecks, getData } from '../utils/api';
+import { ScrollView, View, Text, Button} from 'react-native';
+import { getDecks } from '../utils/api';
 import Decks from './Decks';
+import { receiveDecks } from '../actions';
+import { connect } from 'react-redux';
 
 class HomeScreen extends Component{
-    
+    state = {
+      decks: {},
+      error: ''
+    }
     componentDidMount(){
-        getData()
-            .then((decks=>console.log(decks)))
+      const { dispatch } = this.props
+
+        getDecks()
+            .then((decks=>{
+              if(decks === null){
+                dispatch(receiveDecks({}))
+                this.setState({
+                  error:'No decks in database, create new ones'
+                })
+              }else{
+                dispatch(receiveDecks(decks))
+                this.setState(()=>({
+                  decks
+                }))
+              }
+            }))
+            .then
     }
 
     render(){
-        const {navigation} = this.props
-        //console.log(this.state.decks)
+        const {navigation, decks} = this.props
+        const {error } = this.state
+        console.log(decks)
         return (
-            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-              <Text>Home Screen</Text>
-              <Text></Text>
-              <Button
-                title="Go to Details"
-                onPress={()=> navigation.navigate('Details')}
-              />
+            <View>
+            { error !== '' &&(
+              <View>
+                <Text>{error}</Text>
+                <Button
+                  title="Go to New Deck"
+                  onPress={()=> navigation.navigate('NewDeck')}
+                />
+              </View>
+            )}
+            { error === '' && (
+              <View>
+                <ScrollView>
+                  {Object.keys(decks).map(id=>(
+                    <View key={id}>
+                      <Text>{decks[id].title}</Text>
+                      <Text>{decks[id].questions.length} cards</Text>
+                    </View>
+                  ))}
+                </ScrollView>
+                <Button
+                  title="Go to New Deck"
+                  onPress={()=> navigation.navigate('NewDeck')}
+                />
+              </View>
+            )}
             </View>
           );
     }
     
   }
-  
-export default HomeScreen
+ 
+function mapStateToProps({ decks }){
+  return {
+    decks: (typeof decks) === 'undefined' ? {}: decks
+  }
+}  
+export default connect(mapStateToProps)(HomeScreen)

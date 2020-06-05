@@ -1,15 +1,12 @@
 import React from 'react'
 import { View, Text, Button} from 'react-native';
 
-function DetailsScreen({navigation}){
+function IndividualDeck ({ route, navigation }){
+  const { deckId } = route.params
     return(
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <Text>Details Screen</Text>
-        <Button
-          title="Go to details...again"
-          onPress={()=> navigation.push('Details')}
-        />
-        <Button title="Go to home" onPress={()=> navigation.navigate('Home')} />
+        <Text>Individual Deck</Text>
+        <Text>title: {deckId}</Text>
         <Button title="Go back" onPress = {()=> navigation.goBack()} />
         <Button
           title='Go back to first screen in stack'
@@ -19,4 +16,4 @@ function DetailsScreen({navigation}){
     )
 }
   
-export default DetailsScreen
+export default IndividualDeck
