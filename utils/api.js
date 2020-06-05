@@ -1,5 +1,4 @@
 import { AsyncStorage } from "react-native"
-import data from './_Data';
 
 const STORAGE_KEY = 'FLASH_CARDS_DATA'
 //getDecks
@@ -64,26 +63,15 @@ export async function clearDatabase(){
 }
 
 //addcardToDeck(title, card)
-export async function addCardToDeck(key, card){
-    const data = AsyncStorage.getItem(STORAGE_KEY)
-    const updatedData = JSON.parse(data)
-
-    updatedData[key]={
-        ...updatedData[key],
-        qustions:[
-            ...updatedData[key].questions,
-            {
-                question: card.questionInput,
-                answer: card.answerInput,
-            }
-        ]
-    }
-
+export async function addCardToDeck(title, card){
     try {
-        AsyncStorage.setItem(
-            STORAGE_KEY,
-            JSON.stringify(updatedData)
-        )
+        const decks = JSON.parse(await AsyncStorage.getItem(STORAGE_KEY))
+        await AsyncStorage.mergeItem(STORAGE_KEY, JSON.stringify ({
+            [title]:{
+                title,
+                questions: decks[title].questions.concat(card)
+            }
+        }))
     }catch(err){
         console.warn('failed to addcard to deck', err)
     }

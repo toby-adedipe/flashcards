@@ -27,7 +27,7 @@ class NewDeck extends Component{
             .then((newDeck)=>{
                 console.log(newDeck)
                 dispatch(addDeck(newDeck))
-                navigation.navigate('IndividualDeck', { deckId: title })
+                navigation.navigate('IndividualDeck', { deckId: title, decks: newDeck })
             })
         this.setState(()=>({
             title: ''

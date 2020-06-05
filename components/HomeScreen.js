@@ -1,7 +1,6 @@
 import React, { Component} from 'react'
-import { ScrollView, View, Text, Button} from 'react-native';
+import { ScrollView, View, Text, Button, TouchableOpacity, StyleSheet} from 'react-native';
 import { getDecks } from '../utils/api';
-import Decks from './Decks';
 import { receiveDecks } from '../actions';
 import { connect } from 'react-redux';
 
@@ -31,14 +30,14 @@ class HomeScreen extends Component{
     }
 
     render(){
-        const {navigation, decks} = this.props
-        const {error } = this.state
+        const {navigation, } = this.props
+        const {error, decks } = this.state
         console.log(decks)
         return (
-            <View>
+            <View style={styles.container}>
             { error !== '' &&(
               <View>
-                <Text>{error}</Text>
+                <Text style={{fontSize: 16, textAlign:'center'}}>{error}</Text>
                 <Button
                   title="Go to New Deck"
                   onPress={()=> navigation.navigate('NewDeck')}
@@ -49,10 +48,14 @@ class HomeScreen extends Component{
               <View>
                 <ScrollView>
                   {Object.keys(decks).map(id=>(
-                    <View key={id}>
-                      <Text>{decks[id].title}</Text>
-                      <Text>{decks[id].questions.length} cards</Text>
-                    </View>
+                    <TouchableOpacity  key={id}
+                      onPress={()=> navigation.navigate('IndividualDeck', {deckId: decks[id].title, decks: decks})}
+                    >
+                      <View style={styles.decks}>
+                        <Text style={{fontSize: 24}}>{decks[id].title}</Text>
+                        <Text style={{fontSize: 16}}>{decks[id].questions.length} cards</Text>
+                      </View>
+                    </TouchableOpacity>
                   ))}
                 </ScrollView>
                 <Button
@@ -67,9 +70,33 @@ class HomeScreen extends Component{
     
   }
  
-function mapStateToProps({ decks }){
-  return {
-    decks: (typeof decks) === 'undefined' ? {}: decks
+
+const styles = StyleSheet.create({
+  container:{
+    flex: 1,
+    marginTop: 10,
+    marginLeft: 16,
+    marginRight: 16,
+  },
+  decks:{
+    height: 80,
+    flex: 1,
+    borderRadius: 5,
+    borderWidth:1,
+    shadowColor: 'rgba(15, 15, 15, 0.1)',
+    shadowOffset: {
+      width: 0, height: 0
+    },
+    shadowOpacity: 1, 
+    marginTop: 10,
+    padding: 10,
+    alignItems: 'center',
+    justifyContent: 'center', 
   }
-}  
-export default connect(mapStateToProps)(HomeScreen)
+})  
+// function mapStateToProps({ decks }){
+//   return {
+//     decks: (typeof decks) === 'undefined' ? {}: decks
+//   }
+// }  
+export default connect()(HomeScreen)
