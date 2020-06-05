@@ -33,7 +33,7 @@ class App extends React.Component {
             <Stack.Screen
               name="NewDeck" 
               component={NewDeck}
-              options={{ title: 'Create New Question'}} 
+              options={{ title: 'Create Deck'}} 
             />
             <Stack.Screen
               name="IndividualDeck"

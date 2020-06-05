@@ -1,5 +1,10 @@
 import React, { Component } from 'react';
-import { View, Text, Button } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { black, white, red, lightGreen, lighBlue } from '../utils/colors'
+import {
+    clearLocalNotification,
+    setLocalNotification,
+} from '../utils/helpers'
 
 class Quiz extends Component{
     state={
@@ -28,6 +33,8 @@ class Quiz extends Component{
         if(deck.questions.length>0){
             this.beginQuiz()
         }
+        clearLocalNotification()
+            .then(setLocalNotification)
     }
     
     beginQuiz(){
@@ -87,59 +94,88 @@ class Quiz extends Component{
             correctQuestions,
         } = this.state;
         const { navigation } = this.props
-        const { deck } = this.props.route.params;
+        const { deckId, deck } = this.props.route.params;
         const totalQuestions = deck.questions.length;
 
+        if(question.questionInput === undefined){
+            return(
+                <View style={ styles.container }>
+                    <Text style={{fontSize: 16, textAlign:'center', color: red}}>No cards(questions) in this deck yet. To Start Playing Add cards</Text>
+                    <TouchableOpacity
+                        onPress={()=>navigation.navigate('NewQuestion', { deckId })}
+                        style={styles.submitBtn}
+                    >
+                        <Text style={styles.btnText}>Add Cards</Text>
+                    </TouchableOpacity>
+                </View>
+            )
+        }
         return(
-            <View>
-                <Text>{ deck.title }</Text>
+            <View style={ styles.container }>
+                <Text style={ styles.headerText}>{ deck.title }</Text>
                 {!completedQuiz && (
                     <View>
-                        <Text>{`${questionIndex}/${totalQuestions}`}</Text>
+                        <Text style={{fontSize:16, textAlign: 'center',}}>{`Question ${questionIndex} of ${totalQuestions}`}</Text>
                         { !showAnswer && (
                             <View>
-                                <View>
-                                    <Text>{question.questionInput}</Text>
+                                <View style={styles.questionCard}>
+                                    <Text style={styles.cardText}>{question.questionInput}?</Text>
                                 </View>
-                                <Button
+                                <TouchableOpacity
                                     onPress={()=>this.showAnswer()}
-                                    title='Show Answer'
-                                />
+                                    style={styles.submitBtn}
+                                >
+                                    <Text style={styles.btnText}>Show Answer</Text>
+                                </TouchableOpacity>
                             </View>
                         )}
                         {showAnswer && (
                             <View>
-                                <View>
-                                    <Text>{question.answerInput}</Text>
+                                <View style={styles.questionCard}>
+                                    <Text style={styles.cardText}>{question.answerInput}</Text>
                                 </View>
-                                <Button 
+                                <TouchableOpacity
                                     onPress={()=>this.onSubmit(true)}
-                                    title="Correct Answer"
-                                />
-                                <Button 
+                                    style={styles.correctBtn}
+                                >
+                                    <Text style={styles.correctText}>Correct Answer</Text>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity
                                     onPress={()=>this.onSubmit(false)}
-                                    title="Wrong Answer"
-                                />
-                                <Button
+                                    style={styles.wrongBtn}
+                                >
+                                    <Text style={styles.wrongText}>Wrong Answer</Text>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity
                                     onPress={()=>this.showAnswer()}
-                                    title='Hide Answer'
-                                />
+                                    style={styles.hideAnswer}
+                                >
+                                    <Text style={styles.hideAnswerText}>Hide Answer</Text>
+                                </TouchableOpacity>
+
                             </View>
                         )}
                     </View>
                 )}
                 {completedQuiz && (
                     <View>
-                        <Text>Scores: { correctQuestions } out of {totalQuestions}</Text>
-
-                        <Button
-                            title='Take Quiz Again'
+                        <Text style={{fontSize:20, textAlign: 'center', marginBottom: 10, marginTop: 200,}}>You Got</Text>
+                        <Text style={{fontSize: 24, textAlign: 'center', marginBottom: 10}}>{Math.trunc((correctQuestions/totalQuestions)*100)}%</Text>
+                        <Text style={{fontSize: 16, textAlign: 'center', marginBottom: 10, }}>Thats { correctQuestions } out of {totalQuestions} questions.</Text>
+                        <TouchableOpacity
                             onPress={()=>this.beginQuiz()}
-                        />
-                        <Button
-                            title='Go to Deck'
+                            style={styles.hideAnswer}
+                        >
+                            <Text style={styles.hideAnswerText}>Try Again</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
                             onPress={()=>navigation.goBack()}
-                        />
+                            style={styles.submitBtn}
+                        >
+                            <Text style={styles.btnText}>Go to Deck</Text>
+                        </TouchableOpacity>
                     </View>
                 )}
                 
@@ -147,5 +183,78 @@ class Quiz extends Component{
         )
     }
 }
+
+const styles = StyleSheet.create({
+    container:{
+        marginTop: 10,
+        marginLeft: 16,
+        marginRight: 16,
+    },
+    headerText:{
+        fontSize: 30,
+        textAlign: 'center',
+    },
+    questionCard:{
+        height: 200,
+        borderWidth: 1,
+        borderRadius: 4,
+        borderColor: '#ccc',
+        marginTop: 20,
+        marginBottom: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    cardText:{
+        fontSize: 20,
+    },
+    submitBtn:{
+        marginBottom: 10,
+        backgroundColor: black,
+        height: 50,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 4,
+    },
+    btnText:{
+        color: white,
+        fontSize: 20,
+    },
+    correctBtn:{
+        marginBottom: 10,
+        backgroundColor: lightGreen,
+        height: 50,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 4,
+    },
+    correctText:{
+        color: black,
+        fontSize: 20,
+    },
+    wrongBtn:{
+        marginBottom: 10,
+        backgroundColor: red,
+        height: 50,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 4,
+    },
+    wrongText:{
+        color: white,
+        fontSize: 20,
+    },
+    hideAnswer:{
+        marginBottom: 10,
+        backgroundColor: lighBlue,
+        height: 50,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 4,
+    },
+    hideAnswerText:{
+        color: black,
+        fontSize: 20,
+    }
+})
 
 export default Quiz

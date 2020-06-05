@@ -4,7 +4,7 @@ import { TextInput } from 'react-native-gesture-handler';
 import { connect } from 'react-redux';
 import { saveDeckTitle, clearDatabase } from '../utils/api';
 import { addDeck } from '../actions';
-import { black, white } from '../utils/colors';
+import { black, white, gray, red } from '../utils/colors';
 import { withSafeAreaInsets } from 'react-native-safe-area-context';
 
 class NewDeck extends Component{
@@ -49,15 +49,19 @@ class NewDeck extends Component{
                     onChangeText={ title=> this.onChangeText(title)}
                     style={styles.textInput}
                 />
-                <Button
+                <TouchableOpacity
                     onPress={this.onSubmit}
                     disabled={title===""}
-                    title='Create New Deck'
-                />
-                <Button
+                    style={title===""? styles.disabledBtn: styles.submitBtn}
+                >
+                    <Text style={title===""? styles.disabledText :styles.btnText}>Create Deck</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
                     onPress={this.clearDb}
-                    title='Delete'
-                />
+                    style={styles.deleteBtn}
+                >
+                    <Text style={styles.deleteText}>Delete all Decks</Text>
+                </TouchableOpacity>
             </View>
         )
     }
@@ -82,13 +86,43 @@ const styles = StyleSheet.create({
         marginTop: 5,
         paddingLeft: 5,
     },
+    disabledBtn:{
+        marginTop: 80,
+        marginBottom: 10,
+        backgroundColor: gray,
+        height: 50,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 4,
+    },
     submitBtn:{
-        flex: 1,
-        color: black,
-        height: 55,
-        textAlign: 'center',
+        marginTop: 80,
+        marginBottom: 10,
+        backgroundColor: black,
+        height: 50,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 4,
+    },
+    btnText:{
+        color: white,
+        fontSize: 20,
+    },
+    disabledText:{
+        color: '#c7c5bf',
+        fontSize: 20,
+    },
+    deleteBtn:{
+        backgroundColor: red,
+        height: 50,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 4,
+    },
+    deleteText:{
+        fontSize: 20,
+        color: white,
     }
-
 })
 
 export default connect()(NewDeck);
